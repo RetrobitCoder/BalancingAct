@@ -1,4 +1,4 @@
-# Title
+# Balancing Act
 [//]: # (image should be banner image for game)
 ![banner image](path)
 
@@ -47,4 +47,4 @@ Rename file from game-master to game or move/copy game sub folder then upload to
 [//]: # (license)
 ## Game License
 ---
-[License](link)
+[MIT](https://opensource.org/licenses/MIT)
