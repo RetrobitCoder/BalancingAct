@@ -3,7 +3,8 @@
 
 #include <Arduboy2.h>
 
-byte numObjects[3] = {0, 0, 0}; // TODO may not need?
-//TODO move ObjectType to its own h file
+#include "Object.h"
+
+Object levels[2][2] = {{Object(1, 1, 1, ObjectType::BOX), Object(2, 2, 2, ObjectType::BOX)},{Object(3, 3, 3, ObjectType::BOX), Object(4, 4, 4, ObjectType::BOX)}}; // TODO add more levels
 
 #endif //levels_h

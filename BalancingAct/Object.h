@@ -3,7 +3,7 @@
 
 #include <Arduboy2.h>
 
-enum class ObjectType : unsigned char
+enum class ObjectType : unsigned int
 {
     BOX, ELEPHANT, LUGGAGE, WEIGHT
 };

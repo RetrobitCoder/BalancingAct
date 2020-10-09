@@ -3,34 +3,36 @@
 /**** Public ****/
 
 Object::Object(const float& fallSpeed, const float& x, const float& y, const ObjectType& objectType) : m_speed(fallSpeed), m_x(x), m_y(y), m_type(objectType)
-{}
+{
+    //TODO set m_weight based off m_type
+}
 
 ObjectType Object::getType() const
 {
-  return m_type;
+    return m_type;
 }
 
 byte Object::getWeight() const
 {
-  return m_weight;
+    return m_weight;
 }
 
 float Object::getX() const
 {
-  return m_x;
+    return m_x;
 }
 
 float Object::getY() const
 {
-  return m_y;
+    return m_y;
 }
 
 void Object::updateObject()
 {
-  m_y++;
+    m_y++;
 }
 
 void Object::updateObject(const float& posStep)
 {
-  m_x += posStep;
+    m_x += posStep;
 }
