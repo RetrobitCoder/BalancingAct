@@ -1,6 +1,8 @@
 #include <Arduboy2.h>
 
 #include "Bitmaps.h"
+#include "Levels.h"
+#include "Object.h"
 
 enum class GameState : unsigned char
 {
@@ -10,6 +12,10 @@ enum class GameState : unsigned char
 Arduboy2 ab;
 
 GameState gameState = GameState::Play; // TODO: change to Title
+
+// screen offsets for dividing up the screen into different sections
+const byte WIDTH_OFFSET = 48;
+const byte HEIGHT_OFFSET = 12;
 
 void setup()
 {
@@ -29,26 +35,62 @@ void setup()
 /***** Start Play state functions *****/
 
 /**
- * Handles drawing overlay on the screen.
- */
+    Handles drawing overlay on the screen.
+*/
 void drawOverlay()
 {
-    byte radius = 5;
-    byte widthOffset = 48;
-    byte heightOffset = 12;
-    
-    ab.drawRoundRect(0, 0, WIDTH, HEIGHT, radius);
+    const byte RADIUS = 5;
 
-    // horizontal bar for weight indicator area
-    ab.drawLine(0, HEIGHT - heightOffset, WIDTH, HEIGHT - heightOffset);
+    ab.drawRoundRect(0, 0, WIDTH, HEIGHT, RADIUS);
 
-    // vertical bar for item info area
-    ab.drawLine(WIDTH - widthOffset, 0, WIDTH - widthOffset, HEIGHT - heightOffset);
+    //horizontal bar for weight indicator area
+    ab.drawLine(0, HEIGHT - HEIGHT_OFFSET, WIDTH, HEIGHT - HEIGHT_OFFSET);
+
+    //vertical bar for item info area
+    ab.drawLine(WIDTH - WIDTH_OFFSET, 0, WIDTH - WIDTH_OFFSET, HEIGHT - HEIGHT_OFFSET);
+}
+
+/**
+    Handles drawing the player and platform where objects will land on
+*/
+void drawPlayer()
+{
+    //draw player
+    const byte PLAYER_OFFSET = 8; //TODO probably want to replace once player sprite is made, maybe store in bitmaps
+    ab.drawRect((WIDTH - WIDTH_OFFSET) / 2 - PLAYER_OFFSET / 2, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET, PLAYER_OFFSET, PLAYER_OFFSET);
+
+    //draw object platform
+    ab.drawLine(4, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1, WIDTH - WIDTH_OFFSET - 4, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1);
+}
+
+/**
+ * Handles drawing the balance meter
+ */
+void drawBalanceMeter()
+{
+  //draw player icon
+  const byte CENTER_OFFSET = 8; //TODO probably want to replace with player icon sprite showing frustration with imbalance
+  ab.drawRect(WIDTH / 2 - CENTER_OFFSET / 2, HEIGHT - CENTER_OFFSET - 2, CENTER_OFFSET, CENTER_OFFSET);
+
+  //draw meter icons
+  //TODO add icons to draw, need a way to know what the balance is, maybe keep track of a weight for left and right side and draw the number of icons based on that
+
+  //draw dead zones, area where once the meter reaches causes a game over
+  //TODO draw dead zone icons
+  ab.drawCircle(5, HEIGHT - CENTER_OFFSET + 1, 4);
+  ab.drawCircle(WIDTH - 5, HEIGHT - CENTER_OFFSET + 1, 4);
 }
 
 void gamePlay()
 {
     drawOverlay();
+    drawPlayer();
+    drawBalanceMeter();
+
+    //TODO update objects list in a level
+    //TODO calculate balance
+    //TODO draw objects
+    //TODO display object info
 }
 
 /***** End Play state functions *****/
