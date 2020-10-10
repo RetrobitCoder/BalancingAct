@@ -8,26 +8,36 @@ enum class GameState : unsigned char
     Title, Play, Pause, Win, GameOver
 };
 
-Arduboy2 ab;
+Arduboy2 arduboy;
 
 GameState gameState = GameState::Play; //TODO: change to Title
+
+byte currentObjectIndex = 0; //current index of the object falling
+byte levelIndex = 0; //current level number, used to get objects out of levels
 
 //screen offsets for dividing up the screen into different sections
 const byte WIDTH_OFFSET = 48;
 const byte HEIGHT_OFFSET = 12;
 
-byte currentObjectIndex = 0; //current index of the object falling
-byte levelIndex = 0; //current level number, used to get objects out of levels
+const byte PLAYER_OFFSET = 8; //TODO probably want to replace once player sprite is made, maybe store in bitmaps
+
+
+//platform for objects to fall on
+const byte PLATFORM_X = 4;
+const byte PLATFORM_Y = HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1;
+const Rect PLATFORM = Rect(PLATFORM_X, PLATFORM_Y, WIDTH - WIDTH_OFFSET - 4, 8);
 
 void setup()
 {
-    ab.begin();
-    ab.clear();
+    arduboy.begin();
 
-    ab.drawCompressed(0, 0, title_card);
+    Arduboy2::clear();
 
-    ab.display();
-    ab.delayShort(3000);
+    Arduboy2Base::drawCompressed(0, 0, title_card);
+
+    Arduboy2::display(CLEAR_BUFFER);
+
+    Arduboy2::delayShort(3000);
 }
 
 /***** Start Title state functions *****/
@@ -37,32 +47,65 @@ void setup()
 /***** Start Play state functions *****/
 
 /**
+    Handles checking if the current object collided with the platform or another object
+*/
+void collisionCheck()
+{
+    bool objectCollided = false;
+
+    for(byte i = 0; i < currentObjectIndex; i++)
+    {
+        //TODO get width and height from sprite info
+        if(Arduboy2::collide(Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), 8, 8),
+                             Rect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8, 8)))
+        {
+            objectCollided = true;
+            break;
+        }
+    }
+
+    if(!objectCollided)
+    {
+        if(Arduboy2::collide(PLATFORM, Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), 8, 8))) //TODO get width and height from sprite info
+        {
+            objectCollided = true;
+        }
+    }
+
+    if(objectCollided) currentObjectIndex++;
+}
+
+/**
     Handles drawing the balance meter
 */
 void drawBalanceMeter()
 {
     //draw player icon
     const byte CENTER_OFFSET = 8; //TODO probably want to replace with player icon sprite showing frustration with imbalance
-    ab.drawRect(WIDTH / 2 - CENTER_OFFSET / 2, HEIGHT - CENTER_OFFSET - 2, CENTER_OFFSET, CENTER_OFFSET);
+    Arduboy2::drawRect(WIDTH / 2 - CENTER_OFFSET / 2, HEIGHT - CENTER_OFFSET - 2, CENTER_OFFSET, CENTER_OFFSET);
 
     //draw meter icons
     //TODO add icons to draw, need a way to know what the balance is, maybe keep track of a weight for left and right side and draw the number of icons based on that
 
     //draw dead zones, area where once the meter reaches causes a game over
     //TODO draw dead zone icons
-    ab.drawCircle(5, HEIGHT - CENTER_OFFSET + 1, 4);
-    ab.drawCircle(WIDTH - 5, HEIGHT - CENTER_OFFSET + 1, 4);
+    Arduboy2::drawCircle(5, HEIGHT - CENTER_OFFSET + 1, 4);
+    Arduboy2::drawCircle(WIDTH - 5, HEIGHT - CENTER_OFFSET + 1, 4);
 }
 
 /**
- * Handles drawing all objects that are currently on the screen (includes ones already placed)
- */
+    Handles drawing all objects that are currently on the screen (includes ones already placed)
+*/
 void drawObjects()
 {
-  for(byte i = 0; i <= currentObjectIndex; i++)
-  {
-    ab.drawRect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8, 8); //TODO draw object sprites
-  }
+    byte lastObjIndex = currentObjectIndex;
+
+    if(lastObjIndex == MAX_NUM_OBJS) lastObjIndex--;
+    
+    for(byte i = 0; i <= lastObjIndex; i++)
+    {
+        Arduboy2::drawRect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8, 8); //TODO draw object sprites
+    }
 }
 
 /**
@@ -70,8 +113,8 @@ void drawObjects()
 */
 void drawObjectInfo()
 {
-    ab.setCursor(WIDTH / 2 + 2, 4);
-    ab.print(levels[0][1].getX()); //TODO display current object's info, and maybe what next object is
+    Arduboy2::setCursor(WIDTH / 2 + 2, 4);
+    arduboy.print(levels[0][1].getX()); //TODO display current object's info, and maybe what next object is
 }
 
 /**
@@ -81,13 +124,13 @@ void drawOverlay()
 {
     const byte RADIUS = 5;
 
-    ab.drawRoundRect(0, 0, WIDTH, HEIGHT, RADIUS);
+    Arduboy2::drawRoundRect(0, 0, WIDTH, HEIGHT, RADIUS);
 
     //horizontal bar for weight indicator area
-    ab.drawLine(0, HEIGHT - HEIGHT_OFFSET, WIDTH, HEIGHT - HEIGHT_OFFSET);
+    Arduboy2::drawLine(0, HEIGHT - HEIGHT_OFFSET, WIDTH, HEIGHT - HEIGHT_OFFSET);
 
     //vertical bar for item info area
-    ab.drawLine(WIDTH - WIDTH_OFFSET, 0, WIDTH - WIDTH_OFFSET, HEIGHT - HEIGHT_OFFSET);
+    Arduboy2::drawLine(WIDTH - WIDTH_OFFSET, 0, WIDTH - WIDTH_OFFSET, HEIGHT - HEIGHT_OFFSET);
 }
 
 /**
@@ -96,11 +139,10 @@ void drawOverlay()
 void drawPlayer()
 {
     //draw player
-    const byte PLAYER_OFFSET = 8; //TODO probably want to replace once player sprite is made, maybe store in bitmaps
-    ab.drawRect((WIDTH - WIDTH_OFFSET) / 2 - PLAYER_OFFSET / 2, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET, PLAYER_OFFSET, PLAYER_OFFSET);
+    Arduboy2::drawRect((WIDTH - WIDTH_OFFSET) / 2 - PLAYER_OFFSET / 2, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET, PLAYER_OFFSET, PLAYER_OFFSET);
 
     //draw object platform
-    ab.drawLine(4, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1, WIDTH - WIDTH_OFFSET - 4, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1); //TODO make a rect object with the same info for object collision
+    Arduboy2::drawLine(4, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1, WIDTH - WIDTH_OFFSET - 4, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1); //TODO make a rect object with the same info for object collision
 }
 
 void gamePlay()
@@ -111,7 +153,24 @@ void gamePlay()
     drawOverlay();
     drawPlayer();
 
-    levels[levelIndex][currentObjectIndex].updateObject();
+    if(currentObjectIndex < MAX_NUM_OBJS)
+    {
+        levels[levelIndex][currentObjectIndex].updateObject();
+
+        collisionCheck();
+    }
+    else
+    {
+        //level is over move to next
+        //levelIndex++; TODO uncomment when working on next level progression
+        //currentObjectIndex = 0;
+
+        //check for win when no more levels
+        if(levelIndex == MAX_NUM_LVLS)
+        {
+            //gameState = GameState::Win; TODO uncomment when working on win condition
+        }
+    }
 
     //TODO update objects list in a level
     //TODO calculate balance
@@ -136,11 +195,9 @@ void gamePlay()
 
 void loop()
 {
-    if(!ab.nextFrame()) return;
+    if(!Arduboy2::nextFrame()) return;
 
-    ab.pollButtons();
-
-    ab.clear();
+    Arduboy2::pollButtons();
 
     switch(gameState)
     {
@@ -157,5 +214,5 @@ void loop()
             break;
     }
 
-    ab.display();
+    Arduboy2::display(CLEAR_BUFFER);
 }
