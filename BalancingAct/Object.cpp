@@ -1,20 +1,40 @@
 #include "Object.h"
 
+String objectNames[4] = {"Box", "Elephnt", "Luggage", "Weight"};
+byte objectWeights[4] = {10, 130, 50, 100};
+
 /**** Public ****/
 
-Object::Object(const float& fallSpeed, const float& x, const float& y, const ObjectType& objectType) : m_speed(fallSpeed), m_x(x), m_y(y), m_type(objectType)
+Object::Object(const float& fallSpeed, const float& x, const float& y, const ObjectType& objectType) : m_speed(fallSpeed), m_x(x), m_y(y)
 {
     //TODO set m_weight based off m_type
+    //wanted to index objectWeights using the ObjectType enum but arduino is not liking that
+
+    switch(objectType)
+    {
+        case ObjectType::BOX:
+            m_index = 0;
+            break;
+        case ObjectType::ELEPHANT:
+            m_index = 1;
+            break;
+        case ObjectType::LUGGAGE:
+            m_index = 2;
+            break;
+        case ObjectType::WEIGHT:
+            m_index = 3;
+            break;
+    }
 }
 
-ObjectType Object::getType() const
+String Object::getName() const
 {
-    return m_type;
+    return objectNames[m_index];
 }
 
 byte Object::getWeight() const
 {
-    return m_weight;
+    return objectWeights[m_index];
 }
 
 float Object::getX() const
@@ -29,7 +49,7 @@ float Object::getY() const
 
 void Object::updateObject()
 {
-    m_y++;
+    m_y += m_speed;
 }
 
 void Object::updateObject(const float& posStep)

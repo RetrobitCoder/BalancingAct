@@ -41,6 +41,7 @@ void setup()
 }
 
 /***** Start Title state functions *****/
+//TODO
 
 /***** End Title state functions *****/
 
@@ -101,7 +102,7 @@ void drawObjects()
     byte lastObjIndex = currentObjectIndex;
 
     if(lastObjIndex == MAX_NUM_OBJS) lastObjIndex--;
-    
+
     for(byte i = 0; i <= lastObjIndex; i++)
     {
         Arduboy2::drawRect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8, 8); //TODO draw object sprites
@@ -109,12 +110,38 @@ void drawObjects()
 }
 
 /**
-    Handles dipslaying object info
+    Handles dipslaying object and level info
 */
-void drawObjectInfo()
+void drawInfo()
 {
-    Arduboy2::setCursor(WIDTH / 2 + 2, 4);
-    arduboy.print(levels[0][1].getX()); //TODO display current object's info, and maybe what next object is
+    Arduboy2::setCursor(WIDTH - WIDTH_OFFSET + 2, 2);
+    arduboy.print("LVL");
+    Arduboy2::setCursor(WIDTH - WIDTH_OFFSET + 20, 2);
+    arduboy.print(levelIndex);
+
+    byte lastObjIndex = currentObjectIndex;
+
+    if(lastObjIndex == MAX_NUM_OBJS) lastObjIndex--; //TODO maybe this kinda check should be moved to gamePlay?
+
+    Arduboy2::setCursor(WIDTH - WIDTH_OFFSET + 2, 10);
+
+    arduboy.print(levels[levelIndex][lastObjIndex]);
+
+    if(lastObjIndex + 1 < MAX_NUM_OBJS)
+    {
+        size_t x = WIDTH - WIDTH_OFFSET + 2;
+        size_t y = Arduboy2::getCursorY() + 8;
+        
+        Arduboy2::setCursor(x, y);
+
+        arduboy.print("Next");
+
+        y += 8;
+
+        Arduboy2::setCursor(x, y);
+
+        arduboy.print(levels[levelIndex][lastObjIndex + 1].getName());
+    }
 }
 
 /**
@@ -149,7 +176,7 @@ void gamePlay()
 {
     drawBalanceMeter();
     drawObjects();
-    drawObjectInfo();
+    drawInfo();
     drawOverlay();
     drawPlayer();
 
@@ -174,45 +201,47 @@ void gamePlay()
 
     //TODO update objects list in a level
     //TODO calculate balance
-    //TODO draw objects
-    //TODO display object info
-    //TODO object collisions
+    //TODO button inputs
 }
 
 /***** End Play state functions *****/
 
 /***** Start Pause state functions *****/
+//TODO
 
 /***** End Pause state functions *****/
 
 /***** Start Win state functions *****/
+//TODO
 
 /***** End Win state functions *****/
 
 /***** Start GameOver state functions *****/
+//TODO
 
 /***** End GameOver state functions *****/
 
 void loop()
 {
-    if(!Arduboy2::nextFrame()) return;
-
-    Arduboy2::pollButtons();
-
-    switch(gameState)
+    if(Arduboy2::nextFrame())
     {
-        case GameState::Title:
-            break;
-        case GameState::Play:
-            gamePlay();
-            break;
-        case GameState::Pause:
-            break;
-        case GameState::Win:
-            break;
-        case GameState::GameOver:
-            break;
-    }
+        Arduboy2::pollButtons();
 
-    Arduboy2::display(CLEAR_BUFFER);
+        switch(gameState)
+        {
+            case GameState::Title:
+                break;
+            case GameState::Play:
+                gamePlay();
+                break;
+            case GameState::Pause:
+                break;
+            case GameState::Win:
+                break;
+            case GameState::GameOver:
+                break;
+        }
+
+        Arduboy2::display(CLEAR_BUFFER);
+    }
 }
