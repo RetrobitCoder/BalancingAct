@@ -125,7 +125,7 @@ void drawInfo()
 
     Arduboy2::setCursor(WIDTH - WIDTH_OFFSET + 2, 10);
 
-    arduboy.print(levels[levelIndex][lastObjIndex]);
+    levels[levelIndex][lastObjIndex].printTo(arduboy);
 
     if(lastObjIndex + 1 < MAX_NUM_OBJS)
     {

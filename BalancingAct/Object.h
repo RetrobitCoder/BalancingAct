@@ -8,7 +8,7 @@ enum class ObjectType : unsigned char
     BOX, ELEPHANT, LUGGAGE, WEIGHT,
 };
 
-class Object : public Printable
+class Object
 {
     public:
         Object(const float& fallSpeed, const float& x, const float& y, const ObjectType& objectType);
@@ -38,29 +38,10 @@ class Object : public Printable
         float getY() const;
 
         /**
-         * @implements print
-         * Allows passing object to arduboy.print
+         * Hanldes printing object info to the screen
+         * @param arduboy reference for print function
          */
-        size_t printTo(Print& p) const
-        {
-          size_t line = 0;
-          size_t x = Arduboy2::getCursorX();
-          size_t y = Arduboy2::getCursorY();
-          
-          line += p.print(this->getName());
-
-          y += 8;
-
-          Arduboy2::setCursor(x, y);
-          line += p.print("Weight");
-
-          y += 8;
-
-          Arduboy2::setCursor(x, y);
-          line += p.print(this->getWeight());
-
-          return line;
-        }
+        void printTo(const Arduboy2& arduboy) const;
 
         /**
          * Update this object's y position

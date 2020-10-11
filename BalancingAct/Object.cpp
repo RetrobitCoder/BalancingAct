@@ -47,6 +47,24 @@ float Object::getY() const
     return m_y;
 }
 
+void Object::printTo(const Arduboy2& arduboy) const
+{
+    size_t x = Arduboy2::getCursorX();
+    size_t y = Arduboy2::getCursorY();
+
+    arduboy.print(this->getName());
+
+    y += 8;
+
+    Arduboy2::setCursor(x, y);
+    arduboy.print("Weight");
+
+    y += 8;
+
+    Arduboy2::setCursor(x, y);
+    arduboy.print(this->getWeight());
+}
+
 void Object::updateObject()
 {
     m_y += m_speed;
