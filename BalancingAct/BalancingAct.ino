@@ -131,7 +131,7 @@ void drawInfo()
     {
         size_t x = WIDTH - WIDTH_OFFSET + 2;
         size_t y = Arduboy2::getCursorY() + 8;
-        
+
         Arduboy2::setCursor(x, y);
 
         arduboy.print("Next");
@@ -172,6 +172,20 @@ void drawPlayer()
     Arduboy2::drawLine(4, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1, WIDTH - WIDTH_OFFSET - 4, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1); //TODO make a rect object with the same info for object collision
 }
 
+/**
+    Handles getting user input to move object
+*/
+void moveObject()
+{
+    float x = levels[levelIndex][currentObjectIndex].getX();
+    float lateralMove = 0;
+
+    if(Arduboy2::pressed(LEFT_BUTTON) && x != 1) lateralMove = -0.5;
+    else if(Arduboy2::pressed(RIGHT_BUTTON) && x != WIDTH - WIDTH_OFFSET - 8) lateralMove = 0.5; //TODO replace 8 with object sprite width
+
+    levels[levelIndex][currentObjectIndex].updateObject(lateralMove);
+}
+
 void gamePlay()
 {
     drawBalanceMeter();
@@ -182,6 +196,8 @@ void gamePlay()
 
     if(currentObjectIndex < MAX_NUM_OBJS)
     {
+        moveObject();
+
         levels[levelIndex][currentObjectIndex].updateObject();
 
         collisionCheck();
