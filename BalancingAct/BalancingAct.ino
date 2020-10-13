@@ -97,12 +97,8 @@ void drawBalanceMeter()
 /**
     Handles drawing all objects that are currently on the screen (includes ones already placed)
 */
-void drawObjects()
+void drawObjects(const byte& lastObjIndex)
 {
-    byte lastObjIndex = currentObjectIndex;
-
-    if(lastObjIndex == MAX_NUM_OBJS) lastObjIndex--;
-
     for(byte i = 0; i <= lastObjIndex; i++)
     {
         Arduboy2::drawRect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8, 8); //TODO draw object sprites
@@ -112,16 +108,12 @@ void drawObjects()
 /**
     Handles dipslaying object and level info
 */
-void drawInfo()
+void drawInfo(const byte& lastObjIndex)
 {
     Arduboy2::setCursor(WIDTH - WIDTH_OFFSET + 2, 2);
     arduboy.print("LVL");
     Arduboy2::setCursor(WIDTH - WIDTH_OFFSET + 20, 2);
     arduboy.print(levelIndex);
-
-    byte lastObjIndex = currentObjectIndex;
-
-    if(lastObjIndex == MAX_NUM_OBJS) lastObjIndex--; //TODO maybe this kinda check should be moved to gamePlay?
 
     Arduboy2::setCursor(WIDTH - WIDTH_OFFSET + 2, 10);
 
@@ -183,41 +175,53 @@ void moveObject()
     if(Arduboy2::pressed(LEFT_BUTTON) && x != 1) lateralMove = -0.5;
     else if(Arduboy2::pressed(RIGHT_BUTTON) && x != WIDTH - WIDTH_OFFSET - 8) lateralMove = 0.5; //TODO replace 8 with object sprite width
 
-    levels[levelIndex][currentObjectIndex].updateObject(lateralMove);
+    levels[levelIndex][currentObjectIndex].updateObject(lateralMove, false);
 }
 
 void gamePlay()
 {
-    drawBalanceMeter();
-    drawObjects();
-    drawInfo();
-    drawOverlay();
-    drawPlayer();
-
-    if(currentObjectIndex < MAX_NUM_OBJS)
+    if(!Arduboy2::justPressed(A_BUTTON) || !Arduboy2::justPressed(B_BUTTON))
     {
-        moveObject();
+        byte lastObjIndex = currentObjectIndex;
 
-        levels[levelIndex][currentObjectIndex].updateObject();
+        if(lastObjIndex == MAX_NUM_OBJS) lastObjIndex--;
 
-        collisionCheck();
+        drawBalanceMeter();
+        drawObjects(lastObjIndex);
+        drawInfo(lastObjIndex);
+        drawOverlay();
+        drawPlayer();
+        //TODO draw background for falling objects, would be cool when left or right is pressed that background looked like it was moving
+
+        if(currentObjectIndex < MAX_NUM_OBJS)
+        {
+            moveObject();
+
+            if(Arduboy2::pressed(DOWN_BUTTON) || Arduboy2::pressed(UP_BUTTON)) levels[levelIndex][currentObjectIndex].updateObject(1, true);
+            else levels[levelIndex][currentObjectIndex].updateObject();
+
+            collisionCheck();
+        }
+        else
+        {
+            //level is over move to next
+            //levelIndex++; TODO uncomment when working on next level progression
+            //currentObjectIndex = 0;
+
+            //check for win when no more levels
+            if(levelIndex == MAX_NUM_LVLS)
+            {
+                //gameState = GameState::Win; TODO uncomment when working on win condition
+            }
+        }
     }
     else
     {
-        //level is over move to next
-        //levelIndex++; TODO uncomment when working on next level progression
-        //currentObjectIndex = 0;
-
-        //check for win when no more levels
-        if(levelIndex == MAX_NUM_LVLS)
-        {
-            //gameState = GameState::Win; TODO uncomment when working on win condition
-        }
+        //TODO pause game
     }
 
     //TODO update objects list in a level
     //TODO calculate balance
-    //TODO button inputs
 }
 
 /***** End Play state functions *****/

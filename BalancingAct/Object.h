@@ -49,9 +49,10 @@ class Object
          void updateObject();
 
          /**
-          * Update this objects x position
+          * Update this objects x/y position
+          * @param fastDrop, when true, increase fall speed (y pos)
           */
-          void updateObject(const float& posStep);
+          void updateObject(const float& posStep, const bool& fastDrop);
          
     private:
         byte m_index = 0;

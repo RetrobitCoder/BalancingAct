@@ -70,7 +70,8 @@ void Object::updateObject()
     m_y += m_speed;
 }
 
-void Object::updateObject(const float& posStep)
+void Object::updateObject(const float& posStep, const bool& fastDrop)
 {
-    m_x += posStep;
+    if(fastDrop) m_y += posStep;
+    else m_x += posStep;
 }
