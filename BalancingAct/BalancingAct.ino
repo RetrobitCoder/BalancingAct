@@ -57,8 +57,8 @@ void collisionCheck()
     for(byte i = 0; i < currentObjectIndex; i++)
     {
         //TODO get width and height from sprite info
-        if(Arduboy2::collide(Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), 8, 8),
-                             Rect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8, 8)))
+        if(Arduboy2::collide(Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), 8 + 1, 8 + 1),
+                             Rect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8 + 1, 8 + 1)))
         {
             objectCollided = true;
             break;
@@ -67,13 +67,13 @@ void collisionCheck()
 
     if(!objectCollided)
     {
-        if(Arduboy2::collide(PLATFORM, Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), 8, 8))) //TODO get width and height from sprite info
+        if(Arduboy2::collide(PLATFORM, Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), 8 + 1, 8 + 1))) //TODO get width and height from sprite info
         {
             objectCollided = true;
         }
     }
 
-    if(objectCollided) currentObjectIndex++; //TODO maybe want to snap object to just above platform?
+    if(objectCollided) currentObjectIndex++;
 }
 
 /**
