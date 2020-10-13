@@ -97,8 +97,12 @@ void drawBalanceMeter()
 /**
     Handles drawing all objects that are currently on the screen (includes ones already placed)
 */
-void drawObjects(const byte& lastObjIndex)
+void drawObjects()
 {
+    byte lastObjIndex = currentObjectIndex;
+
+    if(lastObjIndex == MAX_NUM_OBJS) lastObjIndex--;
+    
     for(byte i = 0; i <= lastObjIndex; i++)
     {
         Arduboy2::drawRect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8, 8); //TODO draw object sprites
@@ -182,12 +186,9 @@ void gamePlay()
 {
     if(!Arduboy2::justPressed(A_BUTTON) || !Arduboy2::justPressed(B_BUTTON))
     {
-        byte lastObjIndex = currentObjectIndex;
-
-        if(lastObjIndex == MAX_NUM_OBJS) lastObjIndex--;
-
         drawBalanceMeter();
-        drawObjects(lastObjIndex);
+        drawObjects();
+
         drawOverlay();
         drawPlayer();
         //TODO draw background for falling objects, would be cool when left or right is pressed that background looked like it was moving
