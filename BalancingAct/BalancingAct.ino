@@ -73,7 +73,7 @@ void collisionCheck()
         }
     }
 
-    if(objectCollided) currentObjectIndex++;
+    if(objectCollided) currentObjectIndex++; //TODO maybe want to snap object to just above platform?
 }
 
 /**
@@ -108,7 +108,7 @@ void drawObjects(const byte& lastObjIndex)
 /**
     Handles dipslaying object and level info
 */
-void drawInfo(const byte& lastObjIndex)
+void drawInfo()
 {
     Arduboy2::setCursor(WIDTH - WIDTH_OFFSET + 2, 2);
     arduboy.print("LVL");
@@ -117,9 +117,9 @@ void drawInfo(const byte& lastObjIndex)
 
     Arduboy2::setCursor(WIDTH - WIDTH_OFFSET + 2, 10);
 
-    levels[levelIndex][lastObjIndex].printTo(arduboy);
+    levels[levelIndex][currentObjectIndex].printTo(arduboy);
 
-    if(lastObjIndex + 1 < MAX_NUM_OBJS)
+    if(currentObjectIndex + 1 < MAX_NUM_OBJS)
     {
         size_t x = WIDTH - WIDTH_OFFSET + 2;
         size_t y = Arduboy2::getCursorY() + 8;
@@ -132,7 +132,7 @@ void drawInfo(const byte& lastObjIndex)
 
         Arduboy2::setCursor(x, y);
 
-        arduboy.print(levels[levelIndex][lastObjIndex + 1].getName());
+        arduboy.print(levels[levelIndex][currentObjectIndex + 1].getName());
     }
 }
 
@@ -188,13 +188,14 @@ void gamePlay()
 
         drawBalanceMeter();
         drawObjects(lastObjIndex);
-        drawInfo(lastObjIndex);
         drawOverlay();
         drawPlayer();
         //TODO draw background for falling objects, would be cool when left or right is pressed that background looked like it was moving
 
         if(currentObjectIndex < MAX_NUM_OBJS)
         {
+            drawInfo();
+
             moveObject();
 
             if(Arduboy2::pressed(DOWN_BUTTON) || Arduboy2::pressed(UP_BUTTON)) levels[levelIndex][currentObjectIndex].updateObject(1, true);
