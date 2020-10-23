@@ -10,10 +10,8 @@ enum class GameState : unsigned char
 
 Arduboy2 arduboy;
 
+//game info
 GameState gameState = GameState::Play; //TODO: change to Title
-
-byte currentObjectIndex = 0; //current index of the object falling
-byte levelIndex = 0; //current level number, used to get objects out of levels
 
 //screen offsets for dividing up the screen into different sections
 const byte WIDTH_OFFSET = 48;
@@ -21,11 +19,13 @@ const byte HEIGHT_OFFSET = 12;
 
 const byte PLAYER_OFFSET = 8; //TODO probably want to replace once player sprite is made, maybe store in bitmaps
 
-
 //platform for objects to fall on
 const byte PLATFORM_X = 4;
 const byte PLATFORM_Y = HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1;
-const Rect PLATFORM = Rect(PLATFORM_X, PLATFORM_Y, WIDTH - WIDTH_OFFSET - 4, 8);
+
+//level info
+byte currentObjectIndex = 0; //current index of the object falling
+byte levelIndex = 0; //current level number, used to get objects out of levels
 
 void setup()
 {
@@ -48,11 +48,32 @@ void setup()
 /***** Start Play state functions *****/
 
 /**
+    Handles figure out the weight of a side
+*/
+byte calculateWeight(const Rect& side)
+{
+    byte weightTotal = 0;
+
+    for(byte i = 0; i < currentObjectIndex; i++)
+    {
+        //TODO get width and height from sprite info
+        if(Arduboy2::collide(side, Rect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8 + 1, 8 + 1)))
+        {
+            weightTotal += levels[levelIndex][i].getWeight();
+        }
+    }
+
+    return weightTotal;
+}
+
+/**
     Handles checking if the current object collided with the platform or another object
 */
 void collisionCheck()
 {
     bool objectCollided = false;
+
+    const Rect PLATFORM = Rect(PLATFORM_X, PLATFORM_Y, WIDTH - WIDTH_OFFSET - 4, 8);
 
     for(byte i = 0; i < currentObjectIndex; i++)
     {
@@ -79,19 +100,26 @@ void collisionCheck()
 /**
     Handles drawing the balance meter
 */
-void drawBalanceMeter()
+void drawBalanceMeter(const int& platformWeight)
 {
     //draw player icon
     const byte CENTER_OFFSET = 8; //TODO probably want to replace with player icon sprite showing frustration with imbalance
     Arduboy2::drawRect(WIDTH / 2 - CENTER_OFFSET / 2, HEIGHT - CENTER_OFFSET - 2, CENTER_OFFSET, CENTER_OFFSET);
 
-    //draw meter icons
-    //TODO add icons to draw, need a way to know what the balance is, maybe keep track of a weight for left and right side and draw the number of icons based on that
+    //draw meter
+    const byte MAX_WEIGHT_FILL = (WIDTH / 2) - (PLAYER_OFFSET / 2);
+    const int MAX_WEIGHT_PER_SIDE = 500;
 
-    //draw dead zones, area where once the meter reaches causes a game over
-    //TODO draw dead zone icons
-    Arduboy2::drawCircle(5, HEIGHT - CENTER_OFFSET + 1, 4);
-    Arduboy2::drawCircle(WIDTH - 5, HEIGHT - CENTER_OFFSET + 1, 4);
+    const int WEIGHT_FILL = (MAX_WEIGHT_FILL * platformWeight) / MAX_WEIGHT_PER_SIDE;
+
+    if(platformWeight < 0) //left
+    {
+        Arduboy2::fillRect(MAX_WEIGHT_FILL + WEIGHT_FILL, HEIGHT - HEIGHT_OFFSET + 1, (-1 * WEIGHT_FILL), HEIGHT - HEIGHT_OFFSET + 1);
+    }
+    else if(platformWeight > 0) //right
+    {
+        Arduboy2::fillRect(MAX_WEIGHT_FILL + PLAYER_OFFSET, HEIGHT - HEIGHT_OFFSET + 1, WEIGHT_FILL, HEIGHT - HEIGHT_OFFSET + 1);
+    }
 }
 
 /**
@@ -102,7 +130,7 @@ void drawObjects()
     byte lastObjIndex = currentObjectIndex;
 
     if(lastObjIndex == MAX_NUM_OBJS) lastObjIndex--;
-    
+
     for(byte i = 0; i <= lastObjIndex; i++)
     {
         Arduboy2::drawRect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8, 8); //TODO draw object sprites
@@ -165,7 +193,7 @@ void drawPlayer()
     Arduboy2::drawRect((WIDTH - WIDTH_OFFSET) / 2 - PLAYER_OFFSET / 2, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET, PLAYER_OFFSET, PLAYER_OFFSET);
 
     //draw object platform
-    Arduboy2::drawLine(4, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1, WIDTH - WIDTH_OFFSET - 4, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1); //TODO make a rect object with the same info for object collision
+    Arduboy2::drawLine(PLATFORM_X, PLATFORM_Y, WIDTH - WIDTH_OFFSET - 4, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1);
 }
 
 /**
@@ -186,11 +214,14 @@ void gamePlay()
 {
     if(!Arduboy2::justPressed(A_BUTTON) || !Arduboy2::justPressed(B_BUTTON))
     {
-        drawBalanceMeter();
-        drawObjects();
+        //hit box to figure out how much the left and right side weigh on the platform
+        const Rect LEFT_SIDE = Rect(0, 0, (WIDTH - WIDTH_OFFSET) / 2, HEIGHT - HEIGHT_OFFSET);
+        const Rect RIGHT_SIDE = Rect((WIDTH - WIDTH_OFFSET) / 2, 0,  (WIDTH - WIDTH_OFFSET) / 2, HEIGHT - HEIGHT_OFFSET);
 
         drawOverlay();
         drawPlayer();
+        drawObjects();
+
         //TODO draw background for falling objects, would be cool when left or right is pressed that background looked like it was moving
 
         if(currentObjectIndex < MAX_NUM_OBJS)
@@ -216,6 +247,10 @@ void gamePlay()
                 //gameState = GameState::Win; TODO uncomment when working on win condition
             }
         }
+
+        int platformWeight = calculateWeight(RIGHT_SIDE) - calculateWeight(LEFT_SIDE);
+
+        drawBalanceMeter(platformWeight);
     }
     else
     {
@@ -223,7 +258,7 @@ void gamePlay()
     }
 
     //TODO update objects list in a level
-    //TODO calculate balance
+    //TODO reset level
 }
 
 /***** End Play state functions *****/
