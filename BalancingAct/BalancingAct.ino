@@ -107,7 +107,7 @@ void drawBalanceMeter(const int& platformWeight)
     Arduboy2::drawRect(WIDTH / 2 - CENTER_OFFSET / 2, HEIGHT - CENTER_OFFSET - 2, CENTER_OFFSET, CENTER_OFFSET);
 
     //draw meter
-    const byte MAX_WEIGHT_FILL = (WIDTH / 2) - (PLAYER_OFFSET / 2);
+    const byte MAX_WEIGHT_FILL = (WIDTH / 2) - (CENTER_OFFSET / 2);
     const int MAX_WEIGHT_PER_SIDE = 500;
 
     const int WEIGHT_FILL = (MAX_WEIGHT_FILL * platformWeight) / MAX_WEIGHT_PER_SIDE;
@@ -118,7 +118,7 @@ void drawBalanceMeter(const int& platformWeight)
     }
     else if(platformWeight > 0) //right
     {
-        Arduboy2::fillRect(MAX_WEIGHT_FILL + PLAYER_OFFSET, HEIGHT - HEIGHT_OFFSET + 1, WEIGHT_FILL, HEIGHT - HEIGHT_OFFSET + 1);
+        Arduboy2::fillRect(MAX_WEIGHT_FILL + CENTER_OFFSET, HEIGHT - HEIGHT_OFFSET + 1, WEIGHT_FILL, HEIGHT - HEIGHT_OFFSET + 1);
     }
 }
 
