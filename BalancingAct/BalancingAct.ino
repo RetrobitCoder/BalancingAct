@@ -216,6 +216,9 @@ void moveObject()
     levels[levelIndex][currentObjectIndex].updateObject(lateralMove, false);
 }
 
+/**
+    Play state function
+*/
 void gamePlay()
 {
     if(!Arduboy2::justPressed(A_BUTTON) || !Arduboy2::justPressed(B_BUTTON))
@@ -264,7 +267,7 @@ void gamePlay()
             //check for win when no more levels
             if(levelIndex == MAX_NUM_LVLS)
             {
-                //gameState = GameState::Win; TODO uncomment when working on win condition
+                gameState = GameState::Win;
             }
         }
 
@@ -287,7 +290,31 @@ void gamePlay()
 /***** End Pause state functions *****/
 
 /***** Start Win state functions *****/
-//TODO
+
+/**
+ * Handles drawing the win screen
+ */
+void drawWinScreen()
+{
+  //TODO draw win screen image
+  Arduboy2::setCursor(WIDTH / 2, HEIGHT / 2);
+
+  arduboy.print("Win");
+}
+
+/**
+    Win state function
+*/
+void gameWin()
+{
+  drawWinScreen();
+
+  if(Arduboy2::justPressed(A_BUTTON))
+  {
+    gameState = GameState::Play; //TODO change to title
+    //TODO reset game
+  }
+}
 
 /***** End Win state functions *****/
 
@@ -312,6 +339,7 @@ void loop()
             case GameState::Pause:
                 break;
             case GameState::Win:
+                gameWin();
                 break;
             case GameState::GameOver:
                 break;
