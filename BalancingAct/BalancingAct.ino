@@ -54,9 +54,9 @@ void setup()
 /**
     Handles figure out the weight of a side
 */
-byte calculateWeight(const Rect& side)
+int calculateWeight(const Rect& side)
 {
-    byte weightTotal = 0;
+    int weightTotal = 0;
 
     for(size_t i = 0; i < currentObjectIndex; i++)
     {
@@ -248,21 +248,19 @@ void gamePlay()
             collisionCheck();
 
             platformWeight = calculateWeight(RIGHT_SIDE) - calculateWeight(LEFT_SIDE);
-        }
-        else
-        {
-            platformWeight = calculateWeight(RIGHT_SIDE) - calculateWeight(LEFT_SIDE);
+
+            drawBalanceMeter(platformWeight);
 
             if(platformWeight >= MAX_WEIGHT_PER_SIDE || (-1 * platformWeight) >= MAX_WEIGHT_PER_SIDE)
             {
-                //gameState = GameState::GameOver; TODO uncomment when working on gameover part
+                gameState = GameState::GameOver;
             }
-            else
-            {
-                //level is over move to next
-                levelIndex++;
-                currentObjectIndex = 0;
-            }
+        }
+        else
+        {
+            //level is over move to next
+            levelIndex++;
+            currentObjectIndex = 0;
 
             //check for win when no more levels
             if(levelIndex == MAX_NUM_LVLS)
@@ -270,8 +268,6 @@ void gamePlay()
                 gameState = GameState::Win;
             }
         }
-
-        drawBalanceMeter(platformWeight);
     }
     else
     {
@@ -340,8 +336,31 @@ void gameWin()
 /***** End Win state functions *****/
 
 /***** Start GameOver state functions *****/
-//TODO
 
+/**
+    Handles drawing the lose screen
+*/
+void drawLoseScreen()
+{
+    //TODO draw lose screen image
+    Arduboy2::setCursor(WIDTH / 2, HEIGHT / 2);
+
+    arduboy.print("Lose");
+}
+
+/**
+    GameOver state function
+*/
+void gameOver()
+{
+    drawLoseScreen();
+
+    if(Arduboy2::justPressed(A_BUTTON))
+    {
+        gameState = GameState::Play; //TODO change to title
+        resetGame();
+    }
+}
 /***** End GameOver state functions *****/
 
 void loop()
@@ -363,6 +382,7 @@ void loop()
                 gameWin();
                 break;
             case GameState::GameOver:
+                gameOver();
                 break;
         }
 
