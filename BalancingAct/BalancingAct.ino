@@ -27,6 +27,10 @@ const byte PLATFORM_Y = HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1;
 byte currentObjectIndex = 0; //current index of the object falling
 byte levelIndex = 0; //current level number, used to get objects out of levels
 
+//game info
+const int MAX_WEIGHT_PER_SIDE = 500;
+
+
 void setup()
 {
     arduboy.begin();
@@ -108,7 +112,6 @@ void drawBalanceMeter(const int& platformWeight)
 
     //draw meter
     const byte MAX_WEIGHT_FILL = (WIDTH / 2) - (CENTER_OFFSET / 2);
-    const int MAX_WEIGHT_PER_SIDE = 500;
 
     const int WEIGHT_FILL = (MAX_WEIGHT_FILL * platformWeight) / MAX_WEIGHT_PER_SIDE;
 
@@ -123,28 +126,16 @@ void drawBalanceMeter(const int& platformWeight)
 }
 
 /**
-    Handles drawing all objects that are currently on the screen (includes ones already placed)
-*/
-void drawObjects()
-{
-    byte lastObjIndex = currentObjectIndex;
-
-    if(lastObjIndex == MAX_NUM_OBJS) lastObjIndex--;
-
-    for(byte i = 0; i <= lastObjIndex; i++)
-    {
-        Arduboy2::drawRect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8, 8); //TODO draw object sprites
-    }
-}
-
-/**
     Handles dipslaying object and level info
 */
 void drawInfo()
 {
     Arduboy2::setCursor(WIDTH - WIDTH_OFFSET + 2, 2);
+
     arduboy.print("LVL");
+
     Arduboy2::setCursor(WIDTH - WIDTH_OFFSET + 20, 2);
+
     arduboy.print(levelIndex);
 
     Arduboy2::setCursor(WIDTH - WIDTH_OFFSET + 2, 10);
@@ -165,6 +156,21 @@ void drawInfo()
         Arduboy2::setCursor(x, y);
 
         arduboy.print(levels[levelIndex][currentObjectIndex + 1].getName());
+    }
+}
+
+/**
+    Handles drawing all objects that are currently on the screen (includes ones already placed)
+*/
+void drawObjects()
+{
+    byte lastObjIndex = currentObjectIndex;
+
+    if(lastObjIndex == MAX_NUM_OBJS) lastObjIndex--;
+
+    for(byte i = 0; i <= lastObjIndex; i++)
+    {
+        Arduboy2::drawRect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8, 8); //TODO draw object sprites
     }
 }
 
@@ -224,6 +230,9 @@ void gamePlay()
 
         //TODO draw background for falling objects, would be cool when left or right is pressed that background looked like it was moving
 
+        int platformWeight = 0;
+
+
         if(currentObjectIndex < MAX_NUM_OBJS)
         {
             drawInfo();
@@ -234,12 +243,23 @@ void gamePlay()
             else levels[levelIndex][currentObjectIndex].updateObject();
 
             collisionCheck();
+
+            platformWeight = calculateWeight(RIGHT_SIDE) - calculateWeight(LEFT_SIDE);
         }
         else
         {
-            //level is over move to next
-            //levelIndex++; TODO uncomment when working on next level progression
-            //currentObjectIndex = 0;
+            platformWeight = calculateWeight(RIGHT_SIDE) - calculateWeight(LEFT_SIDE);
+
+            if(platformWeight >= MAX_WEIGHT_PER_SIDE || (-1 * platformWeight) >= MAX_WEIGHT_PER_SIDE)
+            {
+                //gameState = GameState::GameOver; TODO uncomment when working on gameover part
+            }
+            else
+            {
+                //level is over move to next
+                levelIndex++;
+                currentObjectIndex = 0;
+            }
 
             //check for win when no more levels
             if(levelIndex == MAX_NUM_LVLS)
@@ -247,8 +267,6 @@ void gamePlay()
                 //gameState = GameState::Win; TODO uncomment when working on win condition
             }
         }
-
-        int platformWeight = calculateWeight(RIGHT_SIDE) - calculateWeight(LEFT_SIDE);
 
         drawBalanceMeter(platformWeight);
     }

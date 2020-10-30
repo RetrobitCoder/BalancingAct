@@ -7,7 +7,6 @@ byte objectWeights[4] = {10, 130, 50, 100};
 
 Object::Object(const float& fallSpeed, const float& x, const float& y, const ObjectType& objectType) : m_speed(fallSpeed), m_x(x), m_y(y)
 {
-    //TODO set m_weight based off m_type
     //wanted to index objectWeights using the ObjectType enum but arduino is not liking that
 
     switch(objectType)
