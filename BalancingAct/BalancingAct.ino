@@ -58,7 +58,7 @@ byte calculateWeight(const Rect& side)
 {
     byte weightTotal = 0;
 
-    for(byte i = 0; i < currentObjectIndex; i++)
+    for(size_t i = 0; i < currentObjectIndex; i++)
     {
         //TODO get width and height from sprite info
         if(Arduboy2::collide(side, Rect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8 + 1, 8 + 1)))
@@ -79,7 +79,7 @@ void collisionCheck()
 
     const Rect PLATFORM = Rect(PLATFORM_X, PLATFORM_Y, WIDTH - WIDTH_OFFSET - 4, 8);
 
-    for(byte i = 0; i < currentObjectIndex; i++)
+    for(size_t i = 0; i < currentObjectIndex; i++)
     {
         //TODO get width and height from sprite info
         if(Arduboy2::collide(Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), 8 + 1, 8 + 1),
@@ -168,7 +168,7 @@ void drawObjects()
 
     if(lastObjIndex == MAX_NUM_OBJS) lastObjIndex--;
 
-    for(byte i = 0; i <= lastObjIndex; i++)
+    for(size_t i = 0; i <= lastObjIndex; i++)
     {
         Arduboy2::drawRect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8, 8); //TODO draw object sprites
     }
@@ -289,17 +289,38 @@ void gamePlay()
 
 /***** End Pause state functions *****/
 
+/**
+    Handles resetting the game after a game over or game win state
+*/
+void resetGame()
+{
+    byte x = (WIDTH - WIDTH_OFFSET) / 2;
+    byte y = 1;
+
+    for(size_t i = 0; i < MAX_NUM_LVLS; i++)
+    {
+        for(size_t j = 0; j < MAX_NUM_OBJS; j++)
+        {
+            levels[i][j].setX(x);
+            levels[i][j].setY(y);
+        }
+    }
+
+    currentObjectIndex = 0;
+    levelIndex = 0;
+}
+
 /***** Start Win state functions *****/
 
 /**
- * Handles drawing the win screen
- */
+    Handles drawing the win screen
+*/
 void drawWinScreen()
 {
-  //TODO draw win screen image
-  Arduboy2::setCursor(WIDTH / 2, HEIGHT / 2);
+    //TODO draw win screen image
+    Arduboy2::setCursor(WIDTH / 2, HEIGHT / 2);
 
-  arduboy.print("Win");
+    arduboy.print("Win");
 }
 
 /**
@@ -307,13 +328,13 @@ void drawWinScreen()
 */
 void gameWin()
 {
-  drawWinScreen();
+    drawWinScreen();
 
-  if(Arduboy2::justPressed(A_BUTTON))
-  {
-    gameState = GameState::Play; //TODO change to title
-    //TODO reset game
-  }
+    if(Arduboy2::justPressed(A_BUTTON))
+    {
+        gameState = GameState::Play; //TODO change to title
+        resetGame();
+    }
 }
 
 /***** End Win state functions *****/

@@ -51,7 +51,7 @@ void Object::printTo(const Arduboy2& arduboy) const
     size_t x = Arduboy2::getCursorX();
     size_t y = Arduboy2::getCursorY();
 
-    arduboy.print(this->getName());
+    arduboy.print(this->getName()); //TODO do I need this->
 
     y += 8;
 
@@ -62,6 +62,16 @@ void Object::printTo(const Arduboy2& arduboy) const
 
     Arduboy2::setCursor(x, y);
     arduboy.print(this->getWeight());
+}
+
+void Object::setX(const float& x)
+{
+    m_x = x;
+}
+
+void Object::setY(const float& y)
+{
+    m_y = y;
 }
 
 void Object::updateObject()
