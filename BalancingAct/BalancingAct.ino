@@ -11,7 +11,7 @@ enum class GameState : unsigned char
 Arduboy2 arduboy;
 
 //game info
-GameState gameState = GameState::Play; //TODO: change to Title
+GameState gameState = GameState::Title;
 
 //screen offsets for dividing up the screen into different sections
 const byte WIDTH_OFFSET = 48;
@@ -37,7 +37,7 @@ void setup()
 
     Arduboy2::clear();
 
-    Arduboy2Base::drawCompressed(0, 0, title_card);
+    Arduboy2Base::drawCompressed(0, 0, logo_card);
 
     Arduboy2::display(CLEAR_BUFFER);
 
@@ -45,8 +45,27 @@ void setup()
 }
 
 /***** Start Title state functions *****/
-//TODO
 
+void drawTitleScreen()
+{
+    //TODO draw title screen image
+    Arduboy2::setCursor(WIDTH / 2, HEIGHT / 2);
+
+    arduboy.print("Title");
+}
+
+/**
+    Title state function
+*/
+void gameTitle()
+{
+    drawTitleScreen();
+
+    if(Arduboy2::justPressed(A_BUTTON) || Arduboy2::justPressed(B_BUTTON))
+    {
+        gameState = GameState::Play;
+    }
+}
 /***** End Title state functions *****/
 
 /***** Start Play state functions *****/
@@ -221,7 +240,7 @@ void moveObject()
 */
 void gamePlay()
 {
-    if(!Arduboy2::justPressed(A_BUTTON) || !Arduboy2::justPressed(B_BUTTON))
+    if(!Arduboy2::justPressed(A_BUTTON) && !Arduboy2::justPressed(B_BUTTON))
     {
         //hit box to figure out how much the left and right side weigh on the platform
         const Rect LEFT_SIDE = Rect(0, 0, (WIDTH - WIDTH_OFFSET) / 2, HEIGHT - HEIGHT_OFFSET);
@@ -271,18 +290,39 @@ void gamePlay()
     }
     else
     {
-        //TODO pause game
+        gameState = GameState::Pause;
     }
 
     //TODO update objects list in a level
-    //TODO reset level
 }
 
 /***** End Play state functions *****/
 
 /***** Start Pause state functions *****/
-//TODO
 
+/**
+    Handles drawing pause screen
+*/
+void drawPauseScreen()
+{
+    //TODO draw pause screen image
+    Arduboy2::setCursor(WIDTH / 2, HEIGHT / 2);
+
+    arduboy.print("Pause");
+}
+
+/**
+    Pause state function
+*/
+void gamePause()
+{
+    drawPauseScreen();
+
+    if(Arduboy2::justPressed(A_BUTTON) || Arduboy2::justPressed(B_BUTTON))
+    {
+        gameState = GameState::Play;
+    }
+}
 /***** End Pause state functions *****/
 
 /**
@@ -328,7 +368,7 @@ void gameWin()
 
     if(Arduboy2::justPressed(A_BUTTON))
     {
-        gameState = GameState::Play; //TODO change to title
+        gameState = GameState::Title;
         resetGame();
     }
 }
@@ -357,7 +397,7 @@ void gameOver()
 
     if(Arduboy2::justPressed(A_BUTTON))
     {
-        gameState = GameState::Play; //TODO change to title
+        gameState = GameState::Title;
         resetGame();
     }
 }
@@ -372,11 +412,13 @@ void loop()
         switch(gameState)
         {
             case GameState::Title:
+                gameTitle();
                 break;
             case GameState::Play:
                 gamePlay();
                 break;
             case GameState::Pause:
+                gamePause();
                 break;
             case GameState::Win:
                 gameWin();
