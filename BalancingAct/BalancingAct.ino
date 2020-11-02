@@ -292,8 +292,6 @@ void gamePlay()
     {
         gameState = GameState::Pause;
     }
-
-    //TODO update objects list in a level
 }
 
 /***** End Play state functions *****/
