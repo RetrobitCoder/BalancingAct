@@ -1,3 +1,6 @@
+// TODO add game art and draw to screen, plus update TODOs for sprite sizes
+// TODO Music
+// TODO Create all the levels
 #include <Arduboy2.h>
 
 #include "Bitmaps.h"
@@ -37,7 +40,7 @@ void setup()
 
     Arduboy2::clear();
 
-    Arduboy2Base::drawCompressed(0, 0, logo_card);
+    Arduboy2::drawCompressed(0, 0, logo_card);
 
     Arduboy2::display(CLEAR_BUFFER);
 
@@ -48,10 +51,10 @@ void setup()
 
 void drawTitleScreen()
 {
-    //TODO draw title screen image
-    Arduboy2::setCursor(WIDTH / 2, HEIGHT / 2);
+    Arduboy2::drawCompressed(0, 0, title);
 
-    arduboy.print("Title");
+    Arduboy2::setCursor(6, HEIGHT - 15);
+    arduboy.print("Press A");
 }
 
 /**
@@ -303,10 +306,10 @@ void gamePlay()
 */
 void drawPauseScreen()
 {
-    //TODO draw pause screen image
-    Arduboy2::setCursor(WIDTH / 2, HEIGHT / 2);
+    Arduboy2::drawCompressed(0, 0, pause_screen);
 
-    arduboy.print("Pause");
+    Arduboy2::setCursor(WIDTH / 2 - (2 * 8), HEIGHT / 2);
+    arduboy.print("Paused");
 }
 
 /**
@@ -351,10 +354,7 @@ void resetGame()
 */
 void drawWinScreen()
 {
-    //TODO draw win screen image
-    Arduboy2::setCursor(WIDTH / 2, HEIGHT / 2);
-
-    arduboy.print("Win");
+    Arduboy2::drawCompressed(0, 0, win);
 }
 
 /**
@@ -380,10 +380,7 @@ void gameWin()
 */
 void drawLoseScreen()
 {
-    //TODO draw lose screen image
-    Arduboy2::setCursor(WIDTH / 2, HEIGHT / 2);
-
-    arduboy.print("Lose");
+    Arduboy2::drawCompressed(0, 0, lose);
 }
 
 /**
