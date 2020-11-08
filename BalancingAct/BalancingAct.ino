@@ -129,8 +129,13 @@ void collisionCheck()
 void drawBalanceMeter(const int& platformWeight)
 {
     //draw player icon
-    const byte CENTER_OFFSET = 8; //TODO probably want to replace with player icon sprite showing frustration with imbalance
-    Arduboy2::drawRect(WIDTH / 2 - CENTER_OFFSET / 2, HEIGHT - CENTER_OFFSET - 2, CENTER_OFFSET, CENTER_OFFSET);
+    const byte CENTER_OFFSET = balance_meter_icons[0];
+    byte frame = 0;
+
+    if(platformWeight < 0) frame = 1;
+    else if(platformWeight > 0) frame = 2;
+    
+    Sprites::drawSelfMasked((WIDTH / 2) - (CENTER_OFFSET / 2), HEIGHT - CENTER_OFFSET - 2, balance_meter_icons, frame);
 
     //draw meter
     const byte MAX_WEIGHT_FILL = (WIDTH / 2) - (CENTER_OFFSET / 2);
@@ -218,7 +223,7 @@ void drawOverlay()
 void drawPlayer()
 {
     //draw player
-    Arduboy2::drawRect((WIDTH - WIDTH_OFFSET) / 2 - PLAYER_OFFSET / 2, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET, PLAYER_OFFSET, PLAYER_OFFSET);
+    Arduboy2::drawCompressed((WIDTH - WIDTH_OFFSET) / 2 - PLAYER_OFFSET / 2, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET, clown);
 
     //draw object platform
     Arduboy2::drawLine(PLATFORM_X, PLATFORM_Y, WIDTH - WIDTH_OFFSET - 4, HEIGHT - HEIGHT_OFFSET - PLAYER_OFFSET - 1);
@@ -252,9 +257,7 @@ void gamePlay()
         drawOverlay();
         drawPlayer();
         drawObjects();
-
-        //TODO draw background for falling objects, would be cool when left or right is pressed that background looked like it was moving
-
+        
         int platformWeight = 0;
 
 
