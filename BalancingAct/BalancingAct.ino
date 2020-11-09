@@ -1,4 +1,3 @@
-// TODO add game art and draw to screen, plus update TODOs for sprite sizes
 // TODO Music
 // TODO Create all the levels
 #include <Arduboy2.h>
@@ -20,7 +19,7 @@ GameState gameState = GameState::Title;
 const byte WIDTH_OFFSET = 48;
 const byte HEIGHT_OFFSET = 12;
 
-const byte PLAYER_OFFSET = 8; //TODO probably want to replace once player sprite is made, maybe store in bitmaps
+const byte PLAYER_OFFSET = 8;
 
 //platform for objects to fall on
 const byte PLATFORM_X = 4;
@@ -71,6 +70,49 @@ void gameTitle()
 }
 /***** End Title state functions *****/
 
+byte getObjWidth(const Object& obj)
+{
+    switch(obj.getIndex())
+    {
+        case 0:
+            return box[0];
+            break;
+        case 1:
+            return elephant[0];
+            break;
+        case 2:
+            return luggage[0];
+            break;
+        case 3:
+            return weight[0];
+            break;
+    }
+
+    return 0;
+}
+
+byte getObjHeight(const Object& obj)
+{
+    // + 1 is to allow for the full object to be drawn and avoid bottom and top lines of objects overlapping
+    switch(obj.getIndex())
+    {
+        case 0:
+            return box[1] + 1;
+            break;
+        case 1:
+            return elephant[1] + 1;
+            break;
+        case 2:
+            return luggage[1] + 1;
+            break;
+        case 3:
+            return weight[1] + 1;
+            break;
+    }
+
+    return 0;
+}
+
 /***** Start Play state functions *****/
 
 /**
@@ -82,8 +124,10 @@ int calculateWeight(const Rect& side)
 
     for(size_t i = 0; i < currentObjectIndex; i++)
     {
-        //TODO get width and height from sprite info
-        if(Arduboy2::collide(side, Rect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8 + 1, 8 + 1)))
+        const byte objWidth = getObjWidth(levels[levelIndex][i]);
+        const byte objHeight = getObjHeight(levels[levelIndex][i]);
+
+        if(Arduboy2::collide(side, Rect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), objWidth, objHeight)))
         {
             weightTotal += levels[levelIndex][i].getWeight();
         }
@@ -101,20 +145,48 @@ void collisionCheck()
 
     const Rect PLATFORM = Rect(PLATFORM_X, PLATFORM_Y, WIDTH - WIDTH_OFFSET - 4, 8);
 
+    const byte curObjWidth = getObjWidth(levels[levelIndex][currentObjectIndex]);
+    const byte curObjHeight = getObjHeight(levels[levelIndex][currentObjectIndex]);
+
     for(size_t i = 0; i < currentObjectIndex; i++)
     {
-        //TODO get width and height from sprite info
-        if(Arduboy2::collide(Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), 8 + 1, 8 + 1),
-                             Rect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8 + 1, 8 + 1)))
+        const byte objWidth = getObjWidth(levels[levelIndex][i]);
+        const byte objHeight = getObjHeight(levels[levelIndex][i]);
+
+        if(Arduboy2::collide(Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), curObjWidth, curObjHeight),
+                             Rect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), objWidth, objHeight)))
         {
-            objectCollided = true;
-            break;
+            // TODO will need to address issue when two objects collide from the side, probably don't what to stop the current object if there is space below
+            // works from left side but not right or top
+            // collision happened from the side
+            if(levels[levelIndex][currentObjectIndex].getY() + getObjHeight(levels[levelIndex][currentObjectIndex]) >= levels[levelIndex][i].getY())
+            {
+                // check if from right
+                if(levels[levelIndex][currentObjectIndex].getX() + getObjWidth(levels[levelIndex][currentObjectIndex]) <= levels[levelIndex][i].getX())
+                {
+                    levels[levelIndex][currentObjectIndex].updateObject(-1, false);
+                }
+                else if(levels[levelIndex][currentObjectIndex].getX() <= levels[levelIndex][i].getX() + getObjWidth(levels[levelIndex][i])) // otherwise it was from the left
+                {
+                    levels[levelIndex][currentObjectIndex].updateObject(1, false);
+                }
+                else
+                {
+                    objectCollided = true;
+                    break;
+                }
+            }
+            else
+            {
+                objectCollided = true;
+                break;
+            }
         }
     }
 
     if(!objectCollided)
     {
-        if(Arduboy2::collide(PLATFORM, Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), 8 + 1, 8 + 1))) //TODO get width and height from sprite info
+        if(Arduboy2::collide(PLATFORM, Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), curObjWidth, curObjHeight)))
         {
             objectCollided = true;
         }
@@ -134,7 +206,7 @@ void drawBalanceMeter(const int& platformWeight)
 
     if(platformWeight < 0) frame = 1;
     else if(platformWeight > 0) frame = 2;
-    
+
     Sprites::drawSelfMasked((WIDTH / 2) - (CENTER_OFFSET / 2), HEIGHT - CENTER_OFFSET - 2, balance_meter_icons, frame);
 
     //draw meter
@@ -197,7 +269,24 @@ void drawObjects()
 
     for(size_t i = 0; i <= lastObjIndex; i++)
     {
-        Arduboy2::drawRect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 8, 8); //TODO draw object sprites
+        const byte x = levels[levelIndex][i].getX();
+        const byte y = levels[levelIndex][i].getY();
+
+        switch(levels[levelIndex][i].getIndex())
+        {
+            case 0:
+                Sprites::drawSelfMasked(x, y, box, 0);
+                break;
+            case 1:
+                Sprites::drawSelfMasked(x, y, elephant, 0);
+                break;
+            case 2:
+                Sprites::drawSelfMasked(x, y, luggage, 0);
+                break;
+            case 3:
+                Sprites::drawSelfMasked(x, y, weight, 0);
+                break;
+        }
     }
 }
 
@@ -238,7 +327,7 @@ void moveObject()
     float lateralMove = 0;
 
     if(Arduboy2::pressed(LEFT_BUTTON) && x != 1) lateralMove = -0.5;
-    else if(Arduboy2::pressed(RIGHT_BUTTON) && x != WIDTH - WIDTH_OFFSET - 8) lateralMove = 0.5; //TODO replace 8 with object sprite width
+    else if(Arduboy2::pressed(RIGHT_BUTTON) && x != WIDTH - WIDTH_OFFSET - getObjWidth(levels[levelIndex][currentObjectIndex])) lateralMove = 0.5;
 
     levels[levelIndex][currentObjectIndex].updateObject(lateralMove, false);
 }
@@ -257,7 +346,7 @@ void gamePlay()
         drawOverlay();
         drawPlayer();
         drawObjects();
-        
+
         int platformWeight = 0;
 
 

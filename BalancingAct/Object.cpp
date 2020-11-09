@@ -26,6 +26,11 @@ Object::Object(const float& fallSpeed, const float& x, const float& y, const Obj
     }
 }
 
+byte Object::getIndex() const
+{
+  return m_index;
+}
+
 String Object::getName() const
 {
     return objectNames[m_index];

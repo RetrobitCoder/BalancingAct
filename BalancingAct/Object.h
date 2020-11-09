@@ -15,6 +15,12 @@ class Object
         ~Object() {};
 
         /**
+            Get the object's index number
+            @return index
+        */
+        byte getIndex() const;
+
+        /**
             Handles getting type as string
         */
         String getName() const;
