@@ -153,34 +153,24 @@ void collisionCheck()
         const byte objWidth = getObjWidth(levels[levelIndex][i]);
         const byte objHeight = getObjHeight(levels[levelIndex][i]);
 
+        // check collision from bottom side
         if(Arduboy2::collide(Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), curObjWidth, curObjHeight),
-                             Rect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), objWidth, objHeight)))
+                             Rect(levels[levelIndex][i].getX() + 1, levels[levelIndex][i].getY(), objWidth, 1)))
         {
-            // TODO will need to address issue when two objects collide from the side, probably don't what to stop the current object if there is space below
-            // works from left side but not right or top
-            // collision happened from the side
-            if(levels[levelIndex][currentObjectIndex].getY() + getObjHeight(levels[levelIndex][currentObjectIndex]) >= levels[levelIndex][i].getY())
-            {
-                // check if from right
-                if(levels[levelIndex][currentObjectIndex].getX() + getObjWidth(levels[levelIndex][currentObjectIndex]) <= levels[levelIndex][i].getX())
-                {
-                    levels[levelIndex][currentObjectIndex].updateObject(-1, false);
-                }
-                else if(levels[levelIndex][currentObjectIndex].getX() <= levels[levelIndex][i].getX() + getObjWidth(levels[levelIndex][i])) // otherwise it was from the left
-                {
-                    levels[levelIndex][currentObjectIndex].updateObject(1, false);
-                }
-                else
-                {
-                    objectCollided = true;
-                    break;
-                }
-            }
-            else
-            {
-                objectCollided = true;
-                break;
-            }
+            objectCollided = true;
+            break;
+        }
+        // check collision from right side
+        else if(Arduboy2::collide(Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), curObjWidth, curObjHeight),
+                                  Rect(levels[levelIndex][i].getX(), levels[levelIndex][i].getY(), 1, objHeight)))
+        {
+            levels[levelIndex][currentObjectIndex].updateObject(-1, false);
+        }
+        // check collision from left side
+        else if(Arduboy2::collide(Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), curObjWidth, curObjHeight),
+                                  Rect(levels[levelIndex][i].getX() + objWidth, levels[levelIndex][i].getY(), 1, objHeight)))
+        {
+            levels[levelIndex][currentObjectIndex].updateObject(1, false);
         }
     }
 
