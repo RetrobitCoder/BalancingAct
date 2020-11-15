@@ -1,9 +1,12 @@
 // TODO Music
 // TODO Create all the levels
 #include <Arduboy2.h>
+#include <ATMlib.h>
 
 #include "Bitmaps.h"
+#include "Effects.h"
 #include "Levels.h"
+#include "Songs.h"
 
 enum class GameState : unsigned char
 {
@@ -11,6 +14,7 @@ enum class GameState : unsigned char
 };
 
 Arduboy2 arduboy;
+ATMsynth atm;
 
 //game info
 GameState gameState = GameState::Title;
@@ -37,6 +41,8 @@ void setup()
 {
     arduboy.begin();
 
+    Arduboy2::audio.on();
+
     Arduboy2::clear();
 
     Arduboy2::drawCompressed(0, 0, logo_card);
@@ -62,6 +68,15 @@ void drawTitleScreen()
 void gameTitle()
 {
     drawTitleScreen();
+
+    static bool playedTune = false;
+
+    if(!playedTune)
+    {
+        atm.play(opening_tune);
+
+        playedTune = true;
+    }
 
     if(Arduboy2::justPressed(A_BUTTON) || Arduboy2::justPressed(B_BUTTON))
     {
@@ -182,7 +197,11 @@ void collisionCheck()
         }
     }
 
-    if(objectCollided) currentObjectIndex++;
+    if(objectCollided)
+    {
+        currentObjectIndex++;
+        atm.play(crash);
+    }
 }
 
 /**
@@ -446,6 +465,15 @@ void gameWin()
 {
     drawWinScreen();
 
+    static bool playedTune = false;
+
+    if(!playedTune)
+    {
+        atm.play(win_tune);
+
+        playedTune = true;
+    }
+
     if(Arduboy2::justPressed(A_BUTTON))
     {
         gameState = GameState::Title;
@@ -471,6 +499,15 @@ void drawLoseScreen()
 void gameOver()
 {
     drawLoseScreen();
+
+    static bool playedTune = false;
+
+    if(!playedTune)
+    {
+        atm.play(lose_tune);
+
+        playedTune = true;
+    }
 
     if(Arduboy2::justPressed(A_BUTTON))
     {
