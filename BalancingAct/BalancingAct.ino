@@ -1,4 +1,3 @@
-// TODO Music
 // TODO Create all the levels
 #include <Arduboy2.h>
 #include <ATMlib.h>
@@ -20,7 +19,6 @@ ATMsynth atm;
 GameState gameState = GameState::Title;
 
 //screen offsets for dividing up the screen into different sections
-const byte WIDTH_OFFSET = 48;
 const byte HEIGHT_OFFSET = 12;
 
 const byte PLAYER_OFFSET = 8;
@@ -205,6 +203,50 @@ void collisionCheck()
 }
 
 /**
+    Checks to make sure spot of current object's spawn point is free from obstacles
+    If not will try another spot at the top, unless there are no spots to place
+    @return true if spawn is ok, false otherwise
+*/
+bool checkSpawn()
+{
+    bool objectCollided = false;
+
+    const byte curObjWidth = getObjWidth(levels[levelIndex][currentObjectIndex]);
+    const byte curObjHeight = getObjHeight(levels[levelIndex][currentObjectIndex]);
+
+    static byte newX = 1;
+
+    for(size_t i = 0; i < currentObjectIndex; i++)
+    {
+        const byte objWidth = getObjWidth(levels[levelIndex][i]);
+        const byte objHeight = getObjHeight(levels[levelIndex][i]);
+
+        // check collision at spawn
+        if(Arduboy2::collide(Rect(levels[levelIndex][currentObjectIndex].getX(), levels[levelIndex][currentObjectIndex].getY(), curObjWidth, curObjHeight),
+                             Rect(levels[levelIndex][i].getX() + 1, levels[levelIndex][i].getY(), objWidth, objHeight)))
+        {
+            objectCollided = true;
+            break;
+        }
+    }
+
+    if(objectCollided)
+    {
+        levels[levelIndex][currentObjectIndex].setX(newX);
+        newX++;
+        return checkSpawn();
+    }
+    else if(newX + curObjWidth >= (WIDTH - WIDTH_OFFSET))
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
+/**
     Handles drawing the balance meter
 */
 void drawBalanceMeter(const int& platformWeight)
@@ -363,20 +405,27 @@ void gamePlay()
         {
             drawInfo();
 
-            moveObject();
-
-            if(Arduboy2::pressed(DOWN_BUTTON) || Arduboy2::pressed(UP_BUTTON)) levels[levelIndex][currentObjectIndex].updateObject(1, true);
-            else levels[levelIndex][currentObjectIndex].updateObject();
-
-            collisionCheck();
-
-            platformWeight = calculateWeight(RIGHT_SIDE) - calculateWeight(LEFT_SIDE);
-
-            drawBalanceMeter(platformWeight);
-
-            if(platformWeight >= MAX_WEIGHT_PER_SIDE || (-1 * platformWeight) >= MAX_WEIGHT_PER_SIDE)
+            if(checkSpawn())
             {
-                gameState = GameState::GameOver;
+                moveObject();
+
+                if(Arduboy2::pressed(DOWN_BUTTON) || Arduboy2::pressed(UP_BUTTON)) levels[levelIndex][currentObjectIndex].updateObject(1, true);
+                else levels[levelIndex][currentObjectIndex].updateObject();
+
+                collisionCheck();
+
+                platformWeight = calculateWeight(RIGHT_SIDE) - calculateWeight(LEFT_SIDE);
+
+                drawBalanceMeter(platformWeight);
+
+                if(platformWeight >= MAX_WEIGHT_PER_SIDE || (-1 * platformWeight) >= MAX_WEIGHT_PER_SIDE)
+                {
+                    gameState = GameState::GameOver;
+                }
+            }
+            else
+            {
+              gameState = GameState::GameOver;
             }
         }
         else
@@ -432,15 +481,12 @@ void gamePause()
 */
 void resetGame()
 {
-    byte x = (WIDTH - WIDTH_OFFSET) / 2;
-    byte y = 1;
-
     for(size_t i = 0; i < MAX_NUM_LVLS; i++)
     {
         for(size_t j = 0; j < MAX_NUM_OBJS; j++)
         {
-            levels[i][j].setX(x);
-            levels[i][j].setY(y);
+            levels[i][j].setX(START_X);
+            levels[i][j].setY(START_Y);
         }
     }
 
