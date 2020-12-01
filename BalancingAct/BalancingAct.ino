@@ -1,4 +1,3 @@
-// TODO Create all the levels
 #include <Arduboy2.h>
 #include <ATMlib.h>
 
@@ -32,7 +31,7 @@ byte currentObjectIndex = 0; //current index of the object falling
 byte levelIndex = 0; //current level number, used to get objects out of levels
 
 //game info
-const int MAX_WEIGHT_PER_SIDE = 500;
+const int MAX_WEIGHT_PER_SIDE = 200;
 
 
 void setup()

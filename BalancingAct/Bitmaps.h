@@ -229,7 +229,7 @@ const unsigned char PROGMEM balance_meter_icons[] =
 // FRAME 02
 0x3c, 0x42, 0x81, 0xc9, 0xa1, 0xa1, 0x4a, 0x3c,
 };
-//TODO may want to do compressed and store sizes to save room?
+
 const unsigned char PROGMEM box[] =
 {
 // width, height,
