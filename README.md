@@ -10,29 +10,40 @@ Game Art: Zachariah Falgout (RetrobitCoder)
 
 Arduboy Library: Arduboy2
 
-Play the game in [browser](https://felipemanga.github.io/ProjectABE/?url=url).
-
-You will want to click build and then the step(F7) arrow.
-
 This game can also be played by downloading [Felipe Manga's Arduboy Emulator](https://github.com/felipemanga/ProjectABE/releases) and dragging and dropping in the hex file.
 
-![screenshot0](path)
-![screenshot1](path)
+![screenshot0](/images/screenshot0.png)
+![screenshot1](/images/screenshot1.png)
 
 [//]: # (story of game)
 ## Story
 ---
 
+What's a person to do when given superhuman strength?
+
+Join a circus and show the world your superhuman strength by holding up heavy objects!
+
+The secret to your power is that you can lift anything as long as you don't have too much weight on one side.
+
 [//]: # (how to play with images from game)
 ## How to Play
 ---
-![title screen](path)
 
-![character image](path)
+Place objects on the platform and try to avoid filling the gauge bar up either all the way to the left or right.
+
+You can balance out the weight on one side by placing objects on the opposite side.
+
+The goal is to try and keep the balance gauge from reaching the ends by balancing the weight on both sides of the platform.
 
 [//]: # (controls)
 ## Controls
 ---
+
+Use left/right button to move falling objects.
+
+Use up/down button to fast drop objects.
+
+Use A/B button to pause/unpause game.
 
 [//]: # (download instructions for .arduboy, .hex, and source)
 ## How to Download
