@@ -1,8 +1,11 @@
 # Balancing Act
-[//]: # (image should be banner image for game)
-![banner image](path)
+![banner image](/Images/banner.png)
 
-[Eye catch image's artist's links](links)
+Banner image by: LENZ
+
+LENZ's work can be found at:
+
+[LENZ's Instagram](https://www.instagram.com/lenzartz/)
 
 Developer: Zachariah Falgout (RetrobitCoder)
 
@@ -15,7 +18,6 @@ This game can also be played by downloading [Felipe Manga's Arduboy Emulator](ht
 ![screenshot0](/Images/screenshot0.png)
 ![screenshot1](/Images/screenshot1.png)
 
-[//]: # (story of game)
 ## Story
 ---
 
@@ -25,7 +27,6 @@ Join a circus and show the world your superhuman strength by holding up heavy ob
 
 The secret to your power is that you can lift anything as long as you don't have too much weight on one side.
 
-[//]: # (how to play with images from game)
 ## How to Play
 ---
 
@@ -35,7 +36,6 @@ You can balance out the weight on one side by placing objects on the opposite si
 
 The goal is to try and keep the balance gauge from reaching the ends by balancing the weight on both sides of the platform.
 
-[//]: # (controls)
 ## Controls
 ---
 
@@ -45,7 +45,6 @@ Use up/down button to fast drop objects.
 
 Use A/B button to pause/unpause game.
 
-[//]: # (download instructions for .arduboy, .hex, and source)
 ## How to Download
 ---
 
@@ -55,7 +54,6 @@ Using an Arduboy game uploader that supports .hex files, or any other tools that
 ### source
 Rename file from game-master to game or move/copy game sub folder then upload to Arduboy using the Arduino IDE.
 
-[//]: # (license)
 ## Game License
 ---
 [MIT](https://opensource.org/licenses/MIT)
